@@ -1,7 +1,7 @@
-# 🎚️ Turntable API
+# Turntable API
 
 <p align="center">
-  <img src="assets/turntable-logo.png" alt="Turntable API" width="300">
+  <img src="assets/banner-retro.png" width="100%" alt="Turntable API Retro Banner">
 </p>
 
 A **RESTful**, **HATEOAS-driven**, **finite-state-machine** API that simulates the behavior of a classic vinyl turntable.  
@@ -9,27 +9,27 @@ Built with **NestJS**, **TypeScript**, and a strong focus on API discoverability
 
 ---
 
-# 🌟 Features
+# Features
 
-### 🎛️ Explicit FSM (Finite State Machine)
+### Explicit FSM (Finite State Machine)
 - The turntable’s power, vinyl, and playback states form a deterministic FSM.
 - Every possible transition is defined and validated centrally.
 - Illegal transitions return precise `409 INVALID_STATE_TRANSITION` responses.
 
-### 🔗 True HATEOAS Navigation
+### True HATEOAS Navigation
 - Clients don’t need to hardcode workflow.
 - Every response includes `_links` describing the *next allowed actions* based on the current state.
 
-### 🌐 Stateless REST API
+### Stateless REST API
 - No server-side sessions.
 - Complete state is held in the turntable resource and returned in every response.
 
-### 🎵 Built-In Vinyl Selector
+### Built-In Vinyl Selector
 - `PUT /turntable/vinyl` loads a **random** MIDI track from a curated catalog.
 
 ---
 
-# 🧠 State Machine Overview
+# State Machine Overview
 
 The turntable’s state space is defined by:
 
@@ -91,6 +91,7 @@ stateDiagram-v2
 | S4 | ON | LOADED | STOPPED |
 | S5 | ON | LOADED | PLAYING |
 
+
 ## HATEOAS Documentation
 
 ### Allowed Actions per State
@@ -151,6 +152,7 @@ When the turntable is in state **S4** (ON / LOADED / STOPPED), the response incl
 }
 ```
 
+
 ### OpenAPI Specification
 
 The OpenAPI paths are auto-generated in `tools/fsm-docs/generated/openapi-paths.yaml`.
@@ -159,7 +161,7 @@ The OpenAPI paths are auto-generated in `tools/fsm-docs/generated/openapi-paths.
 
 ---
 
-# 🚀 Installation
+# Installation
 
 ```bash
 npm install
@@ -167,7 +169,7 @@ npm install
 
 ---
 
-# ▶️ Running the API
+# Running the API
 
 ### Development mode (watch):
 
@@ -190,7 +192,7 @@ http://localhost:3000
 
 ---
 
-# 📡 API Endpoints
+# API Endpoints
 
 ### Entry Point
 
@@ -216,7 +218,7 @@ Returns the API root resource including top-level HATEOAS links.
 
 ---
 
-# 🧪 Example Usage
+# Example Usage
 
 ```bash
 # Get initial state
@@ -237,7 +239,7 @@ curl -X POST http://localhost:3000/turntable/stop
 
 ---
 
-# 🗂️ Project Structure
+# Project Structure
 
 ```
 src/
@@ -256,6 +258,6 @@ src/
 
 ---
 
-# 📜 License
+# License
 
 MIT
