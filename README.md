@@ -1,5 +1,9 @@
 # Turntable API
 
+<p align="center">
+  <img src="assets/turntable-logo.png" alt="Turntable API" width="300">
+</p>
+
 A RESTful HATEOAS API simulating a vinyl turntable. Built with NestJS and TypeScript.
 
 ## Features
