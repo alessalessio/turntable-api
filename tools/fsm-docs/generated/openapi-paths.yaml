@@ -1,21 +1,51 @@
-# Auto-generated OpenAPI paths from FSM definitions
-# Copy these into your main OpenAPI specification
-
+openapi: 3.0.3
+info:
+  title: Turntable API
+  description: RESTful HATEOAS API for a vinyl turntable with FSM-driven state transitions.
+  version: 1.0.0
+  license:
+    name: MIT
+servers:
+  - url: 'http://localhost:3000'
+    description: Local development server
+tags:
+  - name: Turntable
+    description: Turntable state and actions
+  - name: Health
+    description: Health check endpoints
 paths:
   /turntable:
     get:
       operationId: getState
       summary: Get turntable state
-      description: Returns the current turntable state with HATEOAS links.
+      description: Returns the current turntable state with HATEOAS links for available actions.
       tags:
         - Turntable
       responses:
-        '200':
+        200:
           description: Current turntable state
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurntableResource'
+  /health:
+    get:
+      operationId: healthCheck
+      summary: Health check
+      description: Returns the health status of the API.
+      tags:
+        - Health
+      responses:
+        200:
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
   /turntable/power/on:
     post:
       operationId: powerOn
@@ -24,14 +54,14 @@ paths:
       tags:
         - Turntable
       responses:
-        '200':
+        200:
           description: Successful state transition
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurntableResource'
-        '409':
-          description: Invalid state transition
+        409:
+          description: Invalid state transition - action not allowed in current state
           content:
             application/json:
               schema:
@@ -44,14 +74,14 @@ paths:
       tags:
         - Turntable
       responses:
-        '200':
+        200:
           description: Successful state transition
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurntableResource'
-        '409':
-          description: Invalid state transition
+        409:
+          description: Invalid state transition - action not allowed in current state
           content:
             application/json:
               schema:
@@ -59,38 +89,22 @@ paths:
   /turntable/vinyl:
     put:
       operationId: putVinyl
-      summary: Put a vinyl on the turntable
-      description: Loads a random vinyl from the catalog. Only allowed when ON, STOPPED, and no vinyl loaded.
+      summary: Put a vinyl on the turntable / Change the vinyl on the turntable
+      description: |-
+          **put-vinyl**: Loads a random vinyl from the catalog. Only allowed when ON, STOPPED, and no vinyl loaded.
+          
+          **change-vinyl**: Replaces the current vinyl with a random one. Only allowed when ON, STOPPED, and vinyl is loaded.
       tags:
         - Turntable
       responses:
-        '200':
+        200:
           description: Successful state transition
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurntableResource'
-        '409':
-          description: Invalid state transition
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    put:
-      operationId: changeVinyl
-      summary: Change the vinyl on the turntable
-      description: Replaces the current vinyl with a random one. Only allowed when ON, STOPPED, and vinyl is loaded.
-      tags:
-        - Turntable
-      responses:
-        '200':
-          description: Successful state transition
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TurntableResource'
-        '409':
-          description: Invalid state transition
+        409:
+          description: Invalid state transition - action not allowed in current state
           content:
             application/json:
               schema:
@@ -102,14 +116,14 @@ paths:
       tags:
         - Turntable
       responses:
-        '200':
+        200:
           description: Successful state transition
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurntableResource'
-        '409':
-          description: Invalid state transition
+        409:
+          description: Invalid state transition - action not allowed in current state
           content:
             application/json:
               schema:
@@ -122,14 +136,14 @@ paths:
       tags:
         - Turntable
       responses:
-        '200':
+        200:
           description: Successful state transition
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurntableResource'
-        '409':
-          description: Invalid state transition
+        409:
+          description: Invalid state transition - action not allowed in current state
           content:
             application/json:
               schema:
@@ -142,19 +156,18 @@ paths:
       tags:
         - Turntable
       responses:
-        '200':
+        200:
           description: Successful state transition
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurntableResource'
-        '409':
-          description: Invalid state transition
+        409:
+          description: Invalid state transition - action not allowed in current state
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
 components:
   schemas:
     TurntableResource:
@@ -162,38 +175,70 @@ components:
       properties:
         powerState:
           type: string
-          enum: [OFF, ON]
+          enum:
+            - OFF
+            - ON
+          description: Current power state of the turntable
         vinylState:
           type: string
-          enum: [EMPTY, LOADED]
+          enum:
+            - EMPTY
+            - LOADED
+          description: Whether a vinyl is loaded
         playbackState:
           type: string
-          enum: [STOPPED, PLAYING]
+          enum:
+            - STOPPED
+            - PLAYING
+          description: Current playback state
         currentVinyl:
-          $ref: '#/components/schemas/Vinyl'
           nullable: true
+          allOf:
+            - $ref: '#/components/schemas/Vinyl'
+
+          description: Currently loaded vinyl, or null if none
         _links:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/HateoasLink'
+          description: HATEOAS links for available actions
+      required:
+        - powerState
+        - vinylState
+        - playbackState
+        - _links
     Vinyl:
       type: object
       properties:
         id:
           type: string
+          description: Unique vinyl identifier
         title:
           type: string
+          description: Track title
         composer:
           type: string
+          description: Composer name
         midiUrl:
           type: string
+          description: URL to MIDI file
+      required:
+        - id
+        - title
+        - composer
+        - midiUrl
     HateoasLink:
       type: object
       properties:
         href:
           type: string
+          description: URL for the action
         method:
           type: string
+          description: HTTP method to use
+      required:
+        - href
+        - method
     ErrorResponse:
       type: object
       properties:
@@ -202,5 +247,12 @@ components:
           properties:
             code:
               type: string
+              description: Error code
             message:
               type: string
+              description: Human-readable error message
+          required:
+            - code
+            - message
+      required:
+        - error
