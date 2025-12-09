@@ -1,6 +1,6 @@
 /**
  * Orchestrator script that generates all FSM documentation
- * and updates README.md with the generated content.
+ * and updates README.md and Docusaurus docs with the generated content.
  */
 import * as fs from 'fs';
 import * as path from 'path';
@@ -8,8 +8,13 @@ import { generateMermaid } from './generate-mermaid';
 import { generateHateoasDocs } from './generate-hateoas-docs';
 import { generateOpenApiTemplate } from './generate-openapi-template';
 
+// Marker constants
 const README_START_MARKER = '<!-- FSM_DOCS_START -->';
 const README_END_MARKER = '<!-- FSM_DOCS_END -->';
+const FSM_DIAGRAM_START = '<!-- FSM_DIAGRAM_START -->';
+const FSM_DIAGRAM_END = '<!-- FSM_DIAGRAM_END -->';
+const HATEOAS_START = '<!-- HATEOAS_DOCS_START -->';
+const HATEOAS_END = '<!-- HATEOAS_DOCS_END -->';
 
 /**
  * Reads a generated file and returns its content.
@@ -23,36 +28,47 @@ function readGeneratedFile(filename: string): string {
 }
 
 /**
+ * Updates content between markers in a file.
+ */
+function updateFileBetweenMarkers(
+  filePath: string,
+  startMarker: string,
+  endMarker: string,
+  newContent: string,
+): boolean {
+  if (!fs.existsSync(filePath)) {
+    console.warn(`File not found, skipping: ${filePath}`);
+    return false;
+  }
+
+  let content = fs.readFileSync(filePath, 'utf-8');
+  const startIndex = content.indexOf(startMarker);
+  const endIndex = content.indexOf(endMarker);
+
+  if (startIndex === -1 || endIndex === -1) {
+    console.warn(`Markers not found in ${filePath}, skipping`);
+    return false;
+  }
+
+  const replacement = `${startMarker}\n\n${newContent}\n\n${endMarker}`;
+  const before = content.substring(0, startIndex);
+  const after = content.substring(endIndex + endMarker.length);
+  content = before + replacement + after;
+
+  fs.writeFileSync(filePath, content, 'utf-8');
+  console.log(`Updated: ${filePath}`);
+  return true;
+}
+
+/**
  * Updates README.md with generated FSM documentation.
  */
 async function updateReadme(): Promise<void> {
   const readmePath = path.join(__dirname, '..', '..', 'README.md');
-
-  if (!fs.existsSync(readmePath)) {
-    console.warn('README.md not found, skipping update');
-    return;
-  }
-
-  let readme = fs.readFileSync(readmePath, 'utf-8');
-
-  const startIndex = readme.indexOf(README_START_MARKER);
-  const endIndex = readme.indexOf(README_END_MARKER);
-
-  if (startIndex === -1 || endIndex === -1) {
-    console.warn(
-      `README.md does not contain FSM_DOCS markers (${README_START_MARKER} / ${README_END_MARKER}), skipping update`,
-    );
-    return;
-  }
-
-  // Read generated content
   const mermaidContent = readGeneratedFile('mermaid.md');
   const hateoasContent = readGeneratedFile('hateoas.md');
 
-  // Build the replacement content
-  const generatedContent = `${README_START_MARKER}
-
-<!-- ⚠️ AUTO-GENERATED CONTENT - DO NOT EDIT MANUALLY ⚠️ -->
+  const fullContent = `<!-- ⚠️ AUTO-GENERATED CONTENT - DO NOT EDIT MANUALLY ⚠️ -->
 <!-- Run \`npm run build:fsm-docs\` to regenerate -->
 
 ${mermaidContent}
@@ -61,17 +77,30 @@ ${hateoasContent}
 
 ### OpenAPI Specification
 
-The OpenAPI paths are auto-generated in \`tools/fsm-docs/generated/openapi-paths.yaml\`.
+The OpenAPI paths are auto-generated in \`tools/fsm-docs/generated/openapi-paths.yaml\`.`;
 
-${README_END_MARKER}`;
+  updateFileBetweenMarkers(readmePath, README_START_MARKER, README_END_MARKER, fullContent);
+}
 
-  // Replace content between markers
-  const before = readme.substring(0, startIndex);
-  const after = readme.substring(endIndex + README_END_MARKER.length);
-  readme = before + generatedContent + after;
+/**
+ * Updates Docusaurus docs with generated content.
+ */
+async function updateDocusaurusDocs(): Promise<void> {
+  const docsDir = path.join(__dirname, '..', '..', 'docs-site', 'docs');
 
-  fs.writeFileSync(readmePath, readme, 'utf-8');
-  console.log(`Updated: ${readmePath}`);
+  // Update fsm.md with the Mermaid diagram
+  const fsmDocPath = path.join(docsDir, 'fsm.md');
+  const mermaidContent = readGeneratedFile('mermaid.md');
+  updateFileBetweenMarkers(fsmDocPath, FSM_DIAGRAM_START, FSM_DIAGRAM_END, mermaidContent);
+
+  // Update hateoas.md with the HATEOAS docs
+  const hateoasDocPath = path.join(docsDir, 'hateoas.md');
+  const hateoasContent = readGeneratedFile('hateoas.md');
+  // Extract just the tables part (skip the header since the doc has its own)
+  const hateoasTablesOnly = hateoasContent
+    .replace(/^## HATEOAS Documentation\n+/m, '')
+    .trim();
+  updateFileBetweenMarkers(hateoasDocPath, HATEOAS_START, HATEOAS_END, hateoasTablesOnly);
 }
 
 /**
@@ -88,6 +117,9 @@ async function main(): Promise<void> {
 
     // Update README
     await updateReadme();
+
+    // Update Docusaurus docs
+    await updateDocusaurusDocs();
 
     console.log('\n✅ FSM documentation build complete!');
   } catch (error) {

@@ -12,7 +12,10 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "build:fsm-docs": "ts-node tools/fsm-docs/build-fsm-docs.ts",
-    "check:fsm-docs": "npm run build:fsm-docs && git diff --exit-code README.md tools/fsm-docs/generated"
+    "check:fsm-docs": "npm run build:fsm-docs && git diff --exit-code README.md tools/fsm-docs/generated",
+    "docs:start": "cd docs-site && npm start",
+    "docs:build": "cd docs-site && npm run build",
+    "docs:serve": "cd docs-site && npm run serve"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.15",
