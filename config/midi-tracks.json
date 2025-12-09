@@ -1,0 +1,183 @@
+[
+  {
+    "id": "beethoven-moonlight-sonata-mvmt1",
+    "title": "Moonlight Sonata Op. 27 No. 2 - Movement 1",
+    "composer": "Ludwig van Beethoven",
+    "url": "http://www.piano-midi.de/midis/beethoven_op27_2_1.mid"
+  },
+  {
+    "id": "beethoven-fur-elise",
+    "title": "Für Elise",
+    "composer": "Ludwig van Beethoven",
+    "url": "http://www.piano-midi.de/midis/beethoven_fur_elise.mid"
+  },
+  {
+    "id": "beethoven-pathetique-mvmt2",
+    "title": "Piano Sonata No. 8 Pathetique - Movement 2",
+    "composer": "Ludwig van Beethoven",
+    "url": "http://www.piano-midi.de/midis/beethoven_op13_2.mid"
+  },
+  {
+    "id": "chopin-nocturne-op9-no2",
+    "title": "Nocturne Op. 9 No. 2",
+    "composer": "Frédéric Chopin",
+    "url": "http://www.piano-midi.de/midis/chopin_op9_2.mid"
+  },
+  {
+    "id": "chopin-waltz-op64-no1",
+    "title": "Waltz Op. 64 No. 1 (Minute Waltz)",
+    "composer": "Frédéric Chopin",
+    "url": "http://www.piano-midi.de/midis/chopin_op64_1.mid"
+  },
+  {
+    "id": "chopin-prelude-op28-no4",
+    "title": "Prelude Op. 28 No. 4",
+    "composer": "Frédéric Chopin",
+    "url": "http://www.piano-midi.de/midis/chopin_op28_4.mid"
+  },
+  {
+    "id": "mozart-turkish-march",
+    "title": "Turkish March (Rondo alla Turca)",
+    "composer": "Wolfgang Amadeus Mozart",
+    "url": "https://www.mutopiaproject.org/ftp/MozartWA/KV331/march/march.mid"
+  },
+  {
+    "id": "mozart-eine-kleine-nachtmusik",
+    "title": "Eine kleine Nachtmusik",
+    "composer": "Wolfgang Amadeus Mozart",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/mozart-eine-kleine-nachtmusik.mid"
+  },
+  {
+    "id": "mozart-sonata-k545-mvmt1",
+    "title": "Piano Sonata No. 16 K545 - Movement 1",
+    "composer": "Wolfgang Amadeus Mozart",
+    "url": "http://www.piano-midi.de/midis/mozart_k545_1.mid"
+  },
+  {
+    "id": "bach-prelude-c-major-wtc1",
+    "title": "Prelude in C Major (WTC Book 1)",
+    "composer": "Johann Sebastian Bach",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/js-bach-prelude-no1.mid"
+  },
+  {
+    "id": "bach-air-on-the-g-string",
+    "title": "Air on the G String",
+    "composer": "Johann Sebastian Bach",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/air-on-the-g-string.mid"
+  },
+  {
+    "id": "bach-invention-no1",
+    "title": "Two-Part Invention No. 1",
+    "composer": "Johann Sebastian Bach",
+    "url": "http://www.piano-midi.de/midis/bach_invention1.mid"
+  },
+  {
+    "id": "bach-jesu-joy-of-mans-desiring",
+    "title": "Jesu, Joy of Man's Desiring",
+    "composer": "Johann Sebastian Bach",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/js-bach-jesu-joy.mid"
+  },
+  {
+    "id": "vivaldi-spring-mvmt1",
+    "title": "The Four Seasons — Spring, Movement 1",
+    "composer": "Antonio Vivaldi",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/vivaldi-spring-1.mid"
+  },
+  {
+    "id": "vivaldi-winter-mvmt1",
+    "title": "The Four Seasons — Winter, Movement 1",
+    "composer": "Antonio Vivaldi",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/vivaldi-winter-1.mid"
+  },
+  {
+    "id": "vivaldi-autumn-mvmt1",
+    "title": "The Four Seasons — Autumn, Movement 1",
+    "composer": "Antonio Vivaldi",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/vivaldi-autumn-1.mid"
+  },
+  {
+    "id": "debussy-clair-de-lune",
+    "title": "Clair de Lune",
+    "composer": "Claude Debussy",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/clair-de-lune.mid"
+  },
+  {
+    "id": "satie-gymnopedie-no1",
+    "title": "Gymnopédie No. 1",
+    "composer": "Erik Satie",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/erik-satie-gymnopedie-no1.mid"
+  },
+  {
+    "id": "satie-gymnopedie-no3",
+    "title": "Gymnopédie No. 3",
+    "composer": "Erik Satie",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/erik-satie-gymnopedie-no3.mid"
+  },
+  {
+    "id": "grieg-morning-peer-gynt",
+    "title": "Morning Mood (Peer Gynt Suite No. 1)",
+    "composer": "Edvard Grieg",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/grieg-morning.mid"
+  },
+  {
+    "id": "grieg-in-the-hall-of-the-mountain-king",
+    "title": "In the Hall of the Mountain King",
+    "composer": "Edvard Grieg",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/grieg-mountain-king.mid"
+  },
+  {
+    "id": "tchaikovsky-dance-of-the-sugar-plum-fairy",
+    "title": "Dance of the Sugar Plum Fairy",
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/tchaikovsky-sugar-plum-fairy.mid"
+  },
+  {
+    "id": "tchaikovsky-waltz-of-the-flowers",
+    "title": "Waltz of the Flowers",
+    "composer": "Pyotr Ilyich Tchaikovsky",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/tchaikovsky-waltz-of-the-flowers.mid"
+  },
+  {
+    "id": "saint-saens-the-swan",
+    "title": "The Swan (Carnival of the Animals)",
+    "composer": "Camille Saint-Saëns",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/saint-saens-the-swan.mid"
+  },
+  {
+    "id": "saint-saens-aquarium",
+    "title": "Aquarium (Carnival of the Animals)",
+    "composer": "Camille Saint-Saëns",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/saint-saens-aquarium.mid"
+  },
+  {
+    "id": "pachelbel-canon-in-d",
+    "title": "Canon in D",
+    "composer": "Johann Pachelbel",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/pachelbels-canon.mid"
+  },
+  {
+    "id": "schubert-ave-maria",
+    "title": "Ave Maria",
+    "composer": "Franz Schubert",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/schubert-ave-maria.mid"
+  },
+  {
+    "id": "handel-hallelujah",
+    "title": "Hallelujah Chorus (Messiah)",
+    "composer": "George Frideric Handel",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/handel-hallelujah.mid"
+  },
+  {
+    "id": "handel-water-music-suite",
+    "title": "Water Music Suite",
+    "composer": "George Frideric Handel",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/water-music-suite.mid"
+  },
+  {
+    "id": "dvorak-largo-new-world-symphony",
+    "title": "Largo (New World Symphony)",
+    "composer": "Antonín Dvořák",
+    "url": "https://www.mfiles.co.uk/mp3-downloads/dvorak-largo.mid"
+  }
+]
+
