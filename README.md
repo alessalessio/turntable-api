@@ -1,32 +1,53 @@
-# Turntable API
+# 🎚️ Turntable API
 
 <p align="center">
   <img src="assets/turntable-logo.png" alt="Turntable API" width="300">
 </p>
 
-A RESTful HATEOAS API simulating a vinyl turntable. Built with NestJS and TypeScript.
+A **RESTful**, **HATEOAS-driven**, **finite-state-machine** API that simulates the behavior of a classic vinyl turntable.  
+Built with **NestJS**, **TypeScript**, and a strong focus on API discoverability and correctness.
 
-## Features
+---
 
-- **State Machine**: Manages power, vinyl loading, and playback states
-- **HATEOAS**: Hypermedia-driven API with discoverable transitions
-- **REST**: Clean resource-oriented endpoints
+# 🌟 Features
 
-## State Machine
+### 🎛️ Explicit FSM (Finite State Machine)
+- The turntable’s power, vinyl, and playback states form a deterministic FSM.
+- Every possible transition is defined and validated centrally.
+- Illegal transitions return precise `409 INVALID_STATE_TRANSITION` responses.
 
-The turntable uses an explicit finite state machine (FSM) as the single source of truth.
-The state machine, HATEOAS links, and documentation below are **auto-generated** from `src/turntable/fsm.ts`.
+### 🔗 True HATEOAS Navigation
+- Clients don’t need to hardcode workflow.
+- Every response includes `_links` describing the *next allowed actions* based on the current state.
 
-To regenerate after FSM changes:
-```bash
-npm run build:fsm-docs
-```
+### 🌐 Stateless REST API
+- No server-side sessions.
+- Complete state is held in the turntable resource and returned in every response.
+
+### 🎵 Built-In Vinyl Selector
+- `PUT /turntable/vinyl` loads a **random** MIDI track from a curated catalog.
+
+---
+
+# 🧠 State Machine Overview
+
+The turntable’s state space is defined by:
 
 | State Dimension | Values |
 |-----------------|--------|
 | `powerState` | `OFF`, `ON` |
 | `vinylState` | `EMPTY`, `LOADED` |
 | `playbackState` | `STOPPED`, `PLAYING` |
+
+The FSM, HATEOAS link sets, and documentation below are **auto-generated** from `src/turntable/fsm.ts`.
+
+To regenerate derived docs:
+
+```bash
+npm run build:fsm-docs
+```
+
+---
 
 <!-- FSM_DOCS_START -->
 
@@ -69,7 +90,6 @@ stateDiagram-v2
 | S3 | ON | EMPTY | STOPPED |
 | S4 | ON | LOADED | STOPPED |
 | S5 | ON | LOADED | PLAYING |
-
 
 ## HATEOAS Documentation
 
@@ -131,61 +151,72 @@ When the turntable is in state **S4** (ON / LOADED / STOPPED), the response incl
 }
 ```
 
-
 ### OpenAPI Specification
 
 The OpenAPI paths are auto-generated in `tools/fsm-docs/generated/openapi-paths.yaml`.
 
 <!-- FSM_DOCS_END -->
 
-## Installation
+---
+
+# 🚀 Installation
 
 ```bash
 npm install
 ```
 
-## Running
+---
+
+# ▶️ Running the API
+
+### Development mode (watch):
 
 ```bash
-# Development (watch mode)
 npm run start:dev
+```
 
-# Production
+### Production:
+
+```bash
 npm run build
 npm run start:prod
 ```
 
-The server runs on `http://localhost:3000` by default.
+Server defaults to:
 
-## API Endpoints
+```
+http://localhost:3000
+```
+
+---
+
+# 📡 API Endpoints
 
 ### Entry Point
 
-```
+```http
 GET /
 ```
 
-Returns API entry point with HATEOAS links.
+Returns the API root resource including top-level HATEOAS links.
+
+---
 
 ### Turntable Resource
 
-```
-GET    /turntable          # Get current state
-POST   /turntable/power/on # Power on
-POST   /turntable/power/off# Power off
-PUT    /turntable/vinyl    # Put/change vinyl (random selection)
-DELETE /turntable/vinyl    # Remove vinyl
-POST   /turntable/play     # Start playback
-POST   /turntable/stop     # Stop playback
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/turntable` | Retrieve current turntable state |
+| `POST` | `/turntable/power/on` | Power on |
+| `POST` | `/turntable/power/off` | Power off |
+| `PUT` | `/turntable/vinyl` | Put or change vinyl (random track) |
+| `DELETE` | `/turntable/vinyl` | Remove vinyl |
+| `POST` | `/turntable/play` | Start playback |
+| `POST` | `/turntable/stop` | Stop playback |
 
-### Health Check
+---
 
-```
-GET /health
-```
-
-## Example Usage
+# 🧪 Example Usage
 
 ```bash
 # Get initial state
@@ -194,7 +225,7 @@ curl http://localhost:3000/turntable
 # Power on
 curl -X POST http://localhost:3000/turntable/power/on
 
-# Put a vinyl
+# Put a vinyl (random selection)
 curl -X PUT http://localhost:3000/turntable/vinyl
 
 # Start playing
@@ -204,33 +235,27 @@ curl -X POST http://localhost:3000/turntable/play
 curl -X POST http://localhost:3000/turntable/stop
 ```
 
-## Testing
+---
 
-```bash
-# Run tests
-npm test
-
-# Run tests with coverage
-npm run test:cov
-```
-
-## Project Structure
+# 🗂️ Project Structure
 
 ```
 src/
 ├── app.module.ts           # Root module
-├── app.controller.ts       # Entry point controller
+├── app.controller.ts       # Entry point
 ├── main.ts                 # Application bootstrap
-├── health/                 # Health check module
-├── midi/                   # MIDI tracks catalog
+├── health/                 # Health check
+├── midi/                   # MIDI catalog + random selector
 │   └── midi-tracks.service.ts
 └── turntable/              # Turntable domain
     ├── turntable.controller.ts
     ├── turntable.service.ts
-    └── turntable.interface.ts
+    ├── turntable.interface.ts
+    └── fsm.ts              # Explicit finite state machine
 ```
 
-## License
+---
+
+# 📜 License
 
 MIT
-
