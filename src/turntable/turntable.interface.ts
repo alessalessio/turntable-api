@@ -52,17 +52,58 @@ export interface IHateoasLink {
 }
 
 /**
+ * Action names for state machine transitions
+ */
+export type ActionName =
+  | 'power-on'
+  | 'power-off'
+  | 'put-vinyl'
+  | 'change-vinyl'
+  | 'remove-vinyl'
+  | 'play'
+  | 'stop';
+
+/**
+ * FSM state identifiers
+ */
+export type StateId = 'S1' | 'S2' | 'S3' | 'S4' | 'S5';
+
+/**
+ * FSM state definition (without currentVinyl which is a side-effect value)
+ */
+export interface IFsmState {
+  id: StateId;
+  powerState: PowerState;
+  vinylState: VinylState;
+  playbackState: PlaybackState;
+}
+
+/**
+ * FSM transition definition
+ */
+export interface IFsmTransition {
+  from: StateId;
+  action: ActionName;
+  to: StateId;
+}
+
+/**
  * Collection of HATEOAS links
  */
-export interface IHateoasLinks {
+export type IHateoasLinks = {
   self: IHateoasLink;
-  'power-on'?: IHateoasLink;
-  'power-off'?: IHateoasLink;
-  'put-vinyl'?: IHateoasLink;
-  'change-vinyl'?: IHateoasLink;
-  'remove-vinyl'?: IHateoasLink;
-  play?: IHateoasLink;
-  stop?: IHateoasLink;
+} & Partial<Record<ActionName, IHateoasLink>>;
+
+/**
+ * State machine transition definition
+ */
+export interface ITransition {
+  guard: (state: ITurntableState) => boolean;
+  apply: (state: ITurntableState) => ITurntableState;
+  link: {
+    href: string;
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  };
 }
 
 /**

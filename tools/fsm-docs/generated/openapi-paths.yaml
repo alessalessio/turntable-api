@@ -1,0 +1,206 @@
+# Auto-generated OpenAPI paths from FSM definitions
+# Copy these into your main OpenAPI specification
+
+paths:
+  /turntable:
+    get:
+      operationId: getState
+      summary: Get turntable state
+      description: Returns the current turntable state with HATEOAS links.
+      tags:
+        - Turntable
+      responses:
+        '200':
+          description: Current turntable state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurntableResource'
+  /turntable/power/on:
+    post:
+      operationId: powerOn
+      summary: Power on the turntable
+      description: Powers on the turntable. Only allowed when turntable is OFF.
+      tags:
+        - Turntable
+      responses:
+        '200':
+          description: Successful state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurntableResource'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /turntable/power/off:
+    post:
+      operationId: powerOff
+      summary: Power off the turntable
+      description: Powers off the turntable. Only allowed when turntable is ON and playback is STOPPED.
+      tags:
+        - Turntable
+      responses:
+        '200':
+          description: Successful state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurntableResource'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /turntable/vinyl:
+    put:
+      operationId: putVinyl
+      summary: Put a vinyl on the turntable
+      description: Loads a random vinyl from the catalog. Only allowed when ON, STOPPED, and no vinyl loaded.
+      tags:
+        - Turntable
+      responses:
+        '200':
+          description: Successful state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurntableResource'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: changeVinyl
+      summary: Change the vinyl on the turntable
+      description: Replaces the current vinyl with a random one. Only allowed when ON, STOPPED, and vinyl is loaded.
+      tags:
+        - Turntable
+      responses:
+        '200':
+          description: Successful state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurntableResource'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: removeVinyl
+      summary: Remove the vinyl from the turntable
+      description: Removes the current vinyl. Only allowed when ON, STOPPED, and vinyl is loaded.
+      tags:
+        - Turntable
+      responses:
+        '200':
+          description: Successful state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurntableResource'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /turntable/play:
+    post:
+      operationId: play
+      summary: Start playback
+      description: Starts playing the loaded vinyl. Only allowed when ON, vinyl LOADED, and STOPPED.
+      tags:
+        - Turntable
+      responses:
+        '200':
+          description: Successful state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurntableResource'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /turntable/stop:
+    post:
+      operationId: stop
+      summary: Stop playback
+      description: Stops the current playback. Only allowed when PLAYING.
+      tags:
+        - Turntable
+      responses:
+        '200':
+          description: Successful state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurntableResource'
+        '409':
+          description: Invalid state transition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    TurntableResource:
+      type: object
+      properties:
+        powerState:
+          type: string
+          enum: [OFF, ON]
+        vinylState:
+          type: string
+          enum: [EMPTY, LOADED]
+        playbackState:
+          type: string
+          enum: [STOPPED, PLAYING]
+        currentVinyl:
+          $ref: '#/components/schemas/Vinyl'
+          nullable: true
+        _links:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/HateoasLink'
+    Vinyl:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        composer:
+          type: string
+        midiUrl:
+          type: string
+    HateoasLink:
+      type: object
+      properties:
+        href:
+          type: string
+        method:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string

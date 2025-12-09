@@ -10,15 +10,28 @@ A RESTful HATEOAS API simulating a vinyl turntable. Built with NestJS and TypeSc
 
 ## State Machine
 
-The turntable has three state dimensions:
+The turntable uses an explicit finite state machine (FSM) as the single source of truth.
+The state machine, HATEOAS links, and documentation below are **auto-generated** from `src/turntable/fsm.ts`.
 
-| State | Values |
-|-------|--------|
+To regenerate after FSM changes:
+```bash
+npm run build:fsm-docs
+```
+
+| State Dimension | Values |
+|-----------------|--------|
 | `powerState` | `OFF`, `ON` |
 | `vinylState` | `EMPTY`, `LOADED` |
 | `playbackState` | `STOPPED`, `PLAYING` |
 
-### State Diagram
+<!-- FSM_DOCS_START -->
+
+<!-- ⚠️ AUTO-GENERATED CONTENT - DO NOT EDIT MANUALLY ⚠️ -->
+<!-- Run `npm run build:fsm-docs` to regenerate -->
+
+## State Machine Diagram
+
+The turntable API implements a finite state machine with the following states and transitions:
 
 ```mermaid
 stateDiagram-v2
@@ -32,21 +45,18 @@ stateDiagram-v2
 
     [*] --> S1 : Initial State
 
-    S1 --> S3 : powerOn
-    S2 --> S4 : powerOn
-
-    S3 --> S1 : powerOff
-    S4 --> S2 : powerOff
-
-    S3 --> S4 : putVinyl
-    S4 --> S4 : changeVinyl
-    S4 --> S3 : removeVinyl
-
+    S1 --> S3 : power-on
+    S2 --> S4 : power-on
+    S3 --> S1 : power-off
+    S4 --> S2 : power-off
+    S3 --> S4 : put-vinyl
+    S4 --> S4 : change-vinyl
+    S4 --> S3 : remove-vinyl
     S4 --> S5 : play
     S5 --> S4 : stop
 ```
 
-### Combined States
+### States
 
 | State | Power | Vinyl | Playback |
 |-------|-------|-------|----------|
@@ -56,16 +66,73 @@ stateDiagram-v2
 | S4 | ON | LOADED | STOPPED |
 | S5 | ON | LOADED | PLAYING |
 
-### Transitions
 
-| Action | From | To | Preconditions |
-|--------|------|----|---------------|
-| `powerOn` | S1, S2 | S3, S4 | powerState = OFF |
-| `powerOff` | S3, S4 | S1, S2 | powerState = ON, playbackState = STOPPED |
-| `putVinyl` | S3, S4 | S4 | powerState = ON, playbackState = STOPPED |
-| `removeVinyl` | S4 | S3 | powerState = ON, vinylState = LOADED, playbackState = STOPPED |
-| `play` | S4 | S5 | powerState = ON, vinylState = LOADED, playbackState = STOPPED |
-| `stop` | S5 | S4 | playbackState = PLAYING |
+## HATEOAS Documentation
+
+### Allowed Actions per State
+
+Each state exposes only the actions that are valid transitions from that state.
+
+| State | Power / Vinyl / Playback | Allowed Actions |
+|-------|--------------------------|-----------------|
+| S1 | OFF / EMPTY / STOPPED | `power-on` |
+| S2 | OFF / LOADED / STOPPED | `power-on` |
+| S3 | ON / EMPTY / STOPPED | `power-off`, `put-vinyl` |
+| S4 | ON / LOADED / STOPPED | `power-off`, `change-vinyl`, `remove-vinyl`, `play` |
+| S5 | ON / LOADED / PLAYING | `stop` |
+
+### State Transitions
+
+| Action | From | To | Method | Endpoint |
+|--------|------|----|--------|----------|
+| `power-on` | S1 | S3 | `POST` | `/turntable/power/on` |
+| `power-on` | S2 | S4 | `POST` | `/turntable/power/on` |
+| `power-off` | S3 | S1 | `POST` | `/turntable/power/off` |
+| `power-off` | S4 | S2 | `POST` | `/turntable/power/off` |
+| `put-vinyl` | S3 | S4 | `PUT` | `/turntable/vinyl` |
+| `change-vinyl` | S4 | S4 | `PUT` | `/turntable/vinyl` |
+| `remove-vinyl` | S4 | S3 | `DELETE` | `/turntable/vinyl` |
+| `play` | S4 | S5 | `POST` | `/turntable/play` |
+| `stop` | S5 | S4 | `POST` | `/turntable/stop` |
+
+### Action Links Reference
+
+| Action | Method | Endpoint |
+|--------|--------|----------|
+| `power-on` | `POST` | `/turntable/power/on` |
+| `power-off` | `POST` | `/turntable/power/off` |
+| `put-vinyl` | `PUT` | `/turntable/vinyl` |
+| `change-vinyl` | `PUT` | `/turntable/vinyl` |
+| `remove-vinyl` | `DELETE` | `/turntable/vinyl` |
+| `play` | `POST` | `/turntable/play` |
+| `stop` | `POST` | `/turntable/stop` |
+
+### Example Response
+
+When the turntable is in state **S4** (ON / LOADED / STOPPED), the response includes:
+
+```json
+{
+  "powerState": "ON",
+  "vinylState": "LOADED",
+  "playbackState": "STOPPED",
+  "currentVinyl": { "id": "...", "title": "...", "composer": "...", "midiUrl": "..." },
+  "_links": {
+    "self": { "href": "/turntable", "method": "GET" },
+    "power-off": { "href": "/turntable/power/off", "method": "POST" },
+    "change-vinyl": { "href": "/turntable/vinyl", "method": "PUT" },
+    "remove-vinyl": { "href": "/turntable/vinyl", "method": "DELETE" },
+    "play": { "href": "/turntable/play", "method": "POST" }
+  }
+}
+```
+
+
+### OpenAPI Specification
+
+The OpenAPI paths are auto-generated in `tools/fsm-docs/generated/openapi-paths.yaml`.
+
+<!-- FSM_DOCS_END -->
 
 ## Installation
 

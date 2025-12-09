@@ -1,0 +1,40 @@
+name: FSM Documentation Check
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  check-docs:
+    name: Verify FSM docs are up to date
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate FSM documentation
+        run: npm run build:fsm-docs
+
+      - name: Check for uncommitted changes
+        run: |
+          if ! git diff --exit-code README.md tools/fsm-docs/generated; then
+            echo ""
+            echo "❌ FSM documentation is out of date!"
+            echo ""
+            echo "Please run 'npm run build:fsm-docs' locally and commit the changes."
+            echo ""
+            exit 1
+          fi
+          echo "✅ FSM documentation is up to date"

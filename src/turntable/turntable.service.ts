@@ -8,15 +8,19 @@ import {
   IHateoasLinks,
   IVinyl,
   ErrorCode,
+  ActionName,
+  StateId,
 } from './turntable.interface';
+import { FSM_STATES, FSM_TRANSITIONS, ACTION_LINKS } from './fsm';
 import { MidiTracksService } from '../midi/midi-tracks.service';
 
 /**
  * Service managing the turntable domain state and transitions.
- * Implements the state machine for a vinyl turntable with HATEOAS link generation.
+ * Uses an explicit FSM as the single source of truth.
  */
 @Injectable()
 export class TurntableService {
+  private currentStateId: StateId = 'S1';
   private state: ITurntableState = {
     powerState: PowerState.OFF,
     vinylState: VinylState.EMPTY,
@@ -27,7 +31,7 @@ export class TurntableService {
   constructor(private readonly midiTracksService: MidiTracksService) {}
 
   /**
-   * Gets the current turntable state with HATEOAS links
+   * Gets the current turntable state with HATEOAS links.
    */
   getState(): ITurntableResource {
     return {
@@ -38,82 +42,98 @@ export class TurntableService {
 
   /**
    * Powers on the turntable.
-   * Precondition: powerState = OFF
    */
   powerOn(): ITurntableResource {
-    if (this.state.powerState !== PowerState.OFF) {
-      throw new HttpException(
-        {
-          error: {
-            code: ErrorCode.INVALID_STATE_TRANSITION,
-            message: 'Cannot power on: turntable is already ON',
-          },
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
-    this.state.powerState = PowerState.ON;
-    return this.getState();
+    return this.applyAction('power-on');
   }
 
   /**
    * Powers off the turntable.
-   * Precondition: powerState = ON and playbackState = STOPPED
    */
   powerOff(): ITurntableResource {
-    if (this.state.powerState !== PowerState.ON) {
+    return this.applyAction('power-off');
+  }
+
+  /**
+   * Puts or changes a vinyl on the turntable.
+   */
+  putVinyl(): ITurntableResource {
+    const action = this.state.vinylState === VinylState.EMPTY
+      ? 'put-vinyl'
+      : 'change-vinyl';
+    return this.applyAction(action);
+  }
+
+  /**
+   * Removes the vinyl from the turntable.
+   */
+  removeVinyl(): ITurntableResource {
+    return this.applyAction('remove-vinyl');
+  }
+
+  /**
+   * Starts playing music.
+   */
+  play(): ITurntableResource {
+    return this.applyAction('play');
+  }
+
+  /**
+   * Stops playing music.
+   */
+  stop(): ITurntableResource {
+    return this.applyAction('stop');
+  }
+
+  /**
+   * Applies an action using FSM transition lookup.
+   * Finds valid transition, updates state, then runs side effects.
+   */
+  private applyAction(action: ActionName): ITurntableResource {
+    const transition = FSM_TRANSITIONS.find(
+      (t) => t.from === this.currentStateId && t.action === action,
+    );
+    if (!transition) {
       throw new HttpException(
         {
           error: {
             code: ErrorCode.INVALID_STATE_TRANSITION,
-            message: 'Cannot power off: turntable is already OFF',
+            message: this.getErrorMessage(action),
           },
         },
         HttpStatus.CONFLICT,
       );
     }
-    if (this.state.playbackState !== PlaybackState.STOPPED) {
-      throw new HttpException(
-        {
-          error: {
-            code: ErrorCode.INVALID_STATE_TRANSITION,
-            message: 'Cannot power off: music is currently playing',
-          },
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
-    this.state.powerState = PowerState.OFF;
+    this.currentStateId = transition.to;
+    const fsmState = FSM_STATES[this.currentStateId];
+    this.state.powerState = fsmState.powerState;
+    this.state.vinylState = fsmState.vinylState;
+    this.state.playbackState = fsmState.playbackState;
+    this.applySideEffects(action);
     return this.getState();
   }
 
   /**
-   * Puts or changes a vinyl on the turntable by randomly selecting from the MIDI catalog.
-   * Precondition: powerState = ON and playbackState = STOPPED
+   * Executes side effects for actions that require them.
    */
-  putVinyl(): ITurntableResource {
-    if (this.state.powerState !== PowerState.ON) {
-      throw new HttpException(
-        {
-          error: {
-            code: ErrorCode.INVALID_STATE_TRANSITION,
-            message: 'Cannot put vinyl: turntable is OFF',
-          },
-        },
-        HttpStatus.CONFLICT,
-      );
+  private applySideEffects(action: ActionName): void {
+    switch (action) {
+      case 'put-vinyl':
+      case 'change-vinyl':
+        this.setRandomVinyl();
+        break;
+      case 'remove-vinyl':
+        this.clearVinyl();
+        break;
+      default:
+        break;
     }
-    if (this.state.playbackState !== PlaybackState.STOPPED) {
-      throw new HttpException(
-        {
-          error: {
-            code: ErrorCode.INVALID_STATE_TRANSITION,
-            message: 'Cannot change vinyl: music is currently playing',
-          },
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
+  }
+
+  /**
+   * Sets a random vinyl from the MIDI catalog.
+   */
+  private setRandomVinyl(): void {
     if (!this.midiTracksService.isAvailable()) {
       throw new HttpException(
         {
@@ -132,148 +152,44 @@ export class TurntableService {
       composer: track.composer,
       midiUrl: track.url,
     };
-    this.state.vinylState = VinylState.LOADED;
     this.state.currentVinyl = vinyl;
-    return this.getState();
   }
 
   /**
-   * Removes the vinyl from the turntable.
-   * Precondition: powerState = ON and playbackState = STOPPED
+   * Clears the current vinyl.
    */
-  removeVinyl(): ITurntableResource {
-    if (this.state.powerState !== PowerState.ON) {
-      throw new HttpException(
-        {
-          error: {
-            code: ErrorCode.INVALID_STATE_TRANSITION,
-            message: 'Cannot remove vinyl: turntable is OFF',
-          },
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
-    if (this.state.playbackState !== PlaybackState.STOPPED) {
-      throw new HttpException(
-        {
-          error: {
-            code: ErrorCode.INVALID_STATE_TRANSITION,
-            message: 'Cannot remove vinyl: music is currently playing',
-          },
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
-    if (this.state.vinylState !== VinylState.LOADED) {
-      throw new HttpException(
-        {
-          error: {
-            code: ErrorCode.INVALID_STATE_TRANSITION,
-            message: 'Cannot remove vinyl: no vinyl is loaded',
-          },
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
-    this.state.vinylState = VinylState.EMPTY;
+  private clearVinyl(): void {
     this.state.currentVinyl = null;
-    return this.getState();
   }
 
   /**
-   * Starts playing music (state transition only).
-   * Precondition: powerState = ON, vinylState = LOADED, playbackState = STOPPED
+   * Returns a human-readable error message for a failed action.
    */
-  play(): ITurntableResource {
-    if (this.state.powerState !== PowerState.ON) {
-      throw new HttpException(
-        {
-          error: {
-            code: ErrorCode.INVALID_STATE_TRANSITION,
-            message: 'Cannot start music: turntable is OFF',
-          },
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
-    if (this.state.vinylState !== VinylState.LOADED) {
-      throw new HttpException(
-        {
-          error: {
-            code: ErrorCode.INVALID_STATE_TRANSITION,
-            message: 'Cannot start music: no vinyl is loaded',
-          },
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
-    if (this.state.playbackState !== PlaybackState.STOPPED) {
-      throw new HttpException(
-        {
-          error: {
-            code: ErrorCode.INVALID_STATE_TRANSITION,
-            message: 'Cannot start music: music is already playing',
-          },
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
-    this.state.playbackState = PlaybackState.PLAYING;
-    return this.getState();
+  private getErrorMessage(action: ActionName): string {
+    const messages: Record<ActionName, string> = {
+      'power-on': 'Cannot power on: turntable is already ON',
+      'power-off': 'Cannot power off: turntable is OFF or music is playing',
+      'put-vinyl': 'Cannot put vinyl: turntable is OFF, music is playing, or vinyl already loaded',
+      'change-vinyl': 'Cannot change vinyl: turntable is OFF, music is playing, or no vinyl loaded',
+      'remove-vinyl': 'Cannot remove vinyl: turntable is OFF, music is playing, or no vinyl loaded',
+      play: 'Cannot play: turntable is OFF, no vinyl loaded, or already playing',
+      stop: 'Cannot stop: music is not playing',
+    };
+    return messages[action];
   }
 
   /**
-   * Stops playing music (state transition only).
-   * Precondition: playbackState = PLAYING
-   */
-  stop(): ITurntableResource {
-    if (this.state.playbackState !== PlaybackState.PLAYING) {
-      throw new HttpException(
-        {
-          error: {
-            code: ErrorCode.INVALID_STATE_TRANSITION,
-            message: 'Cannot stop music: music is not playing',
-          },
-        },
-        HttpStatus.CONFLICT,
-      );
-    }
-    this.state.playbackState = PlaybackState.STOPPED;
-    return this.getState();
-  }
-
-  /**
-   * Generates HATEOAS links based on current state.
-   * Only includes links for valid state transitions.
+   * Generates HATEOAS links by filtering FSM transitions from current state.
    */
   private generateLinks(): IHateoasLinks {
     const links: IHateoasLinks = {
       self: { href: '/turntable', method: 'GET' },
     };
-    const { powerState, vinylState, playbackState } = this.state;
-    if (powerState === PowerState.OFF) {
-      links['power-on'] = { href: '/turntable/power/on', method: 'POST' };
-    }
-    if (powerState === PowerState.ON && playbackState === PlaybackState.STOPPED) {
-      links['power-off'] = { href: '/turntable/power/off', method: 'POST' };
-    }
-    if (powerState === PowerState.ON && playbackState === PlaybackState.STOPPED) {
-      if (vinylState === VinylState.EMPTY) {
-        links['put-vinyl'] = { href: '/turntable/vinyl', method: 'PUT' };
-      } else {
-        links['change-vinyl'] = { href: '/turntable/vinyl', method: 'PUT' };
-        links['remove-vinyl'] = { href: '/turntable/vinyl', method: 'DELETE' };
-      }
-    }
-    if (
-      powerState === PowerState.ON &&
-      vinylState === VinylState.LOADED &&
-      playbackState === PlaybackState.STOPPED
-    ) {
-      links.play = { href: '/turntable/play', method: 'POST' };
-    }
-    if (playbackState === PlaybackState.PLAYING) {
-      links.stop = { href: '/turntable/stop', method: 'POST' };
+    const availableTransitions = FSM_TRANSITIONS.filter(
+      (t) => t.from === this.currentStateId,
+    );
+    for (const t of availableTransitions) {
+      links[t.action] = ACTION_LINKS[t.action];
     }
     return links;
   }
