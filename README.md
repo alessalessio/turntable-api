@@ -4,6 +4,35 @@
   <img src="assets/banner-retro.png" width="100%" alt="Turntable API Retro Banner">
 </p>
 
+<p align="center">
+  <a href="https://github.com/alessalessio/turntable-api/actions/workflows/fsm-docs.yml">
+    <img src="https://github.com/alessalessio/turntable-api/actions/workflows/fsm-docs.yml/badge.svg" alt="FSM Docs">
+  </a>
+  <a href="https://github.com/alessalessio/turntable-api/actions/workflows/deploy-docs.yml">
+    <img src="https://github.com/alessalessio/turntable-api/actions/workflows/deploy-docs.yml/badge.svg" alt="Deploy Docs">
+  </a>
+  <a href="https://github.com/alessalessio/turntable-api/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/alessalessio/turntable-api" alt="License">
+  </a>
+  <img src="https://img.shields.io/github/package-json/v/alessalessio/turntable-api" alt="Version">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/last-commit/alessalessio/turntable-api" alt="Last Commit">
+  <img src="https://img.shields.io/github/commit-activity/m/alessalessio/turntable-api" alt="Commit Activity">
+  <img src="https://img.shields.io/github/languages/top/alessalessio/turntable-api" alt="Top Language">
+  <img src="https://img.shields.io/badge/node-%3E%3D18-brightgreen" alt="Node Version">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/docs-auto--generated-blue" alt="Auto-generated Docs">
+  <img src="https://img.shields.io/badge/FSM-5%20states%20%7C%209%20transitions-purple" alt="FSM Stats">
+  <img src="https://img.shields.io/badge/HATEOAS-Level%203%20REST-orange" alt="HATEOAS">
+  <a href="https://alessalessio.github.io/turntable-api/">
+    <img src="https://img.shields.io/badge/docs-GitHub%20Pages-blue" alt="Documentation">
+  </a>
+</p>
+
 A **RESTful**, **HATEOAS-driven**, **finite-state-machine** API that simulates the behavior of a classic vinyl turntable.  
 Built with **NestJS**, **TypeScript**, and a strong focus on API discoverability and correctness.
 
