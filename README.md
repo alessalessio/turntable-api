@@ -18,16 +18,54 @@ The turntable has three state dimensions:
 | `vinylState` | `EMPTY`, `LOADED` |
 | `playbackState` | `STOPPED`, `PLAYING` |
 
-### Valid Transitions
+### State Diagram
 
+```mermaid
+stateDiagram-v2
+    direction TB
+
+    state "OFF / EMPTY / STOPPED" as S1
+    state "OFF / LOADED / STOPPED" as S2
+    state "ON / EMPTY / STOPPED" as S3
+    state "ON / LOADED / STOPPED" as S4
+    state "ON / LOADED / PLAYING" as S5
+
+    [*] --> S1 : Initial State
+
+    S1 --> S3 : powerOn
+    S2 --> S4 : powerOn
+
+    S3 --> S1 : powerOff
+    S4 --> S2 : powerOff
+
+    S3 --> S4 : putVinyl
+    S4 --> S4 : changeVinyl
+    S4 --> S3 : removeVinyl
+
+    S4 --> S5 : play
+    S5 --> S4 : stop
 ```
-OFF/EMPTY/STOPPED  --powerOn-->   ON/EMPTY/STOPPED
-ON/EMPTY/STOPPED   --powerOff-->  OFF/EMPTY/STOPPED
-ON/EMPTY/STOPPED   --putVinyl-->  ON/LOADED/STOPPED
-ON/LOADED/STOPPED  --play-->      ON/LOADED/PLAYING
-ON/LOADED/PLAYING  --stop-->      ON/LOADED/STOPPED
-ON/LOADED/STOPPED  --removeVinyl--> ON/EMPTY/STOPPED
-```
+
+### Combined States
+
+| State | Power | Vinyl | Playback |
+|-------|-------|-------|----------|
+| S1 | OFF | EMPTY | STOPPED |
+| S2 | OFF | LOADED | STOPPED |
+| S3 | ON | EMPTY | STOPPED |
+| S4 | ON | LOADED | STOPPED |
+| S5 | ON | LOADED | PLAYING |
+
+### Transitions
+
+| Action | From | To | Preconditions |
+|--------|------|----|---------------|
+| `powerOn` | S1, S2 | S3, S4 | powerState = OFF |
+| `powerOff` | S3, S4 | S1, S2 | powerState = ON, playbackState = STOPPED |
+| `putVinyl` | S3, S4 | S4 | powerState = ON, playbackState = STOPPED |
+| `removeVinyl` | S4 | S3 | powerState = ON, vinylState = LOADED, playbackState = STOPPED |
+| `play` | S4 | S5 | powerState = ON, vinylState = LOADED, playbackState = STOPPED |
+| `stop` | S5 | S4 | playbackState = PLAYING |
 
 ## Installation
 
