@@ -22,7 +22,7 @@ paths:
       tags:
         - Turntable
       responses:
-        200:
+        '200':
           description: Current turntable state
           content:
             application/json:
@@ -36,7 +36,7 @@ paths:
       tags:
         - Health
       responses:
-        200:
+        '200':
           description: API is healthy
           content:
             application/json:
@@ -54,13 +54,13 @@ paths:
       tags:
         - Turntable
       responses:
-        200:
+        '200':
           description: Successful state transition
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurntableResource'
-        409:
+        '409':
           description: Invalid state transition - action not allowed in current state
           content:
             application/json:
@@ -74,13 +74,13 @@ paths:
       tags:
         - Turntable
       responses:
-        200:
+        '200':
           description: Successful state transition
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurntableResource'
-        409:
+        '409':
           description: Invalid state transition - action not allowed in current state
           content:
             application/json:
@@ -97,13 +97,13 @@ paths:
       tags:
         - Turntable
       responses:
-        200:
+        '200':
           description: Successful state transition
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurntableResource'
-        409:
+        '409':
           description: Invalid state transition - action not allowed in current state
           content:
             application/json:
@@ -116,13 +116,13 @@ paths:
       tags:
         - Turntable
       responses:
-        200:
+        '200':
           description: Successful state transition
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurntableResource'
-        409:
+        '409':
           description: Invalid state transition - action not allowed in current state
           content:
             application/json:
@@ -136,13 +136,13 @@ paths:
       tags:
         - Turntable
       responses:
-        200:
+        '200':
           description: Successful state transition
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurntableResource'
-        409:
+        '409':
           description: Invalid state transition - action not allowed in current state
           content:
             application/json:
@@ -156,13 +156,13 @@ paths:
       tags:
         - Turntable
       responses:
-        200:
+        '200':
           description: Successful state transition
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TurntableResource'
-        409:
+        '409':
           description: Invalid state transition - action not allowed in current state
           content:
             application/json:

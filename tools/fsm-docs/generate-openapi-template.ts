@@ -124,7 +124,7 @@ export async function generateOpenApiTemplate(): Promise<void> {
       description: 'Returns the current turntable state with HATEOAS links for available actions.',
       tags: ['Turntable'],
       responses: {
-        '200': {
+        200: {
           description: 'Current turntable state',
           content: {
             'application/json': {
@@ -144,7 +144,7 @@ export async function generateOpenApiTemplate(): Promise<void> {
       description: 'Returns the health status of the API.',
       tags: ['Health'],
       responses: {
-        '200': {
+        200: {
           description: 'API is healthy',
           content: {
             'application/json': {
@@ -201,7 +201,7 @@ export async function generateOpenApiTemplate(): Promise<void> {
       description,
       tags: ['Turntable'],
       responses: {
-        '200': {
+        200: {
           description: 'Successful state transition',
           content: {
             'application/json': {
@@ -209,7 +209,7 @@ export async function generateOpenApiTemplate(): Promise<void> {
             },
           },
         },
-        '409': {
+        409: {
           description: 'Invalid state transition - action not allowed in current state',
           content: {
             'application/json': {
@@ -284,13 +284,15 @@ function jsonToYaml(obj: unknown, indent: number): string {
     }
     return entries.map(([key, value]) => {
       const yamlValue = jsonToYaml(value, indent + 1);
+      // Quote numeric keys (like HTTP status codes)
+      const yamlKey = /^\d+$/.test(key) ? `'${key}'` : key;
       if (typeof value === 'object' && value !== null && !Array.isArray(value) && Object.keys(value).length > 0) {
-        return `${spaces}${key}:\n${yamlValue}`;
+        return `${spaces}${yamlKey}:\n${yamlValue}`;
       }
       if (Array.isArray(value) && value.length > 0) {
-        return `${spaces}${key}:\n${yamlValue}`;
+        return `${spaces}${yamlKey}:\n${yamlValue}`;
       }
-      return `${spaces}${key}: ${yamlValue}`;
+      return `${spaces}${yamlKey}: ${yamlValue}`;
     }).join('\n');
   }
 
